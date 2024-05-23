@@ -1,9 +1,6 @@
 name: Branch Name Check
 
 on:
-  push:
-    branches:
-      - '*'
   pull_request:
     branches:
       - '*'
@@ -15,9 +12,15 @@ jobs:
       - name: Check out repository
         uses: actions/checkout@v2
 
+      - name: Determine branch name
+        id: get_branch
+        run: |
+          BRANCH_NAME="${{ github.head_ref }}"
+          echo "::set-output name=branch_name::$BRANCH_NAME"
+
       - name: Check branch name
         run: |
-          BRANCH_NAME=$(echo ${{ github.ref }} | sed 's/refs\/heads\///')
+          BRANCH_NAME="${{ steps.get_branch.outputs.branch_name }}"
           AUTHOR_NAME=${{ github.actor }}
 
           if [[ ! "$BRANCH_NAME" =~ ^$AUTHOR_NAME ]]; then
