@@ -1,0 +1,25 @@
+name: Branch Name Check
+
+on:
+  create:
+    branches:
+      - '**'
+
+jobs:
+  check-branch-name:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v2
+
+      - name: Check branch name
+        run: |
+          BRANCH_NAME=$(echo ${{ github.ref }} | sed 's/refs\/heads\///')
+          AUTHOR_NAME=${{ github.actor }}
+
+          if [[ ! "$BRANCH_NAME" =~ ^$AUTHOR_NAME ]]; then
+            echo "Error: Branch name '$BRANCH_NAME' does not start with username '$AUTHOR_NAME'."
+            exit 1
+          fi
+
+          echo "Branch name '$BRANCH_NAME' is valid."
